@@ -11,7 +11,9 @@ import { InterviewHistoryPage } from './features/practice/pages/InterviewHistory
 import { LanguageProvider } from './shared/languages';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { UserRole } from './features/auth/types/auth.types';
+
 import './App.css';
+import LeaderboardPage from './features/leaderboard/pages/LeaderboardPage';
 
 function App() {
   return (
@@ -41,6 +43,11 @@ function App() {
                  <Route path="practice/history" element={<InterviewHistoryPage />} />
                  <Route path="practice/history/:id" element={<InterviewResultPage />} />
                </Route>
+             </Route>
+
+             <Route element={<DashboardLayout />}>
+               <Route path="leaderboard" element={<LeaderboardPage />} />
+               <Route path="LeaderboardPage" element={<LeaderboardPage />} />
              </Route>
 
             {/* We will add more routes here later */}

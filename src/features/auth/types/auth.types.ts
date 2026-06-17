@@ -36,6 +36,7 @@ export interface AuthTokensResponse {
 }
 
 export const UserRole = {
+  GUEST: 'guest',
   ADMIN: 'admin',
   HR: 'hr',
   INTERVIEWER: 'interviewer',

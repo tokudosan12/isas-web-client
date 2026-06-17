@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../features/auth/stores/authStore';
 import { useLanguage } from '../shared/languages';
+import { LanguageToggle } from './LanguageToggle';
 
 type NavItem = {
   to: string;
@@ -9,6 +10,7 @@ type NavItem = {
   icon: React.ReactNode;
   end?: boolean;
   permission?: string;
+  requiresAuth?: boolean;
 };
 
 const navLinkClassName = (isActive: boolean, isCollapsed: boolean) =>
@@ -21,7 +23,7 @@ const navLinkClassName = (isActive: boolean, isCollapsed: boolean) =>
   ].join(' ');
 
 export const DashboardLayout: React.FC = () => {
-  const { logout } = useAuthStore();
+  const { isAuthenticated, logout } = useAuthStore();
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -36,6 +38,7 @@ export const DashboardLayout: React.FC = () => {
       {
         to: '/profile',
         label: t('profile.navProfile'),
+        requiresAuth: true,
         icon: (
           <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -45,14 +48,29 @@ export const DashboardLayout: React.FC = () => {
       {
         to: '/practice/history',
         label: t('profile.navInterviewHistory'),
+        requiresAuth: true,
         icon: (
           <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         ),
       },
+      {
+        to: '/leaderboard',
+        label: t('leaderboard.dashboardTitle'),
+        icon: (
+          <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 13h4v8H3v-8zm7-6h4v14h-4V7zm7-4h4v18h-4V3z" />
+          </svg>
+        ),
+      },
     ],
     [t],
+  );
+
+  const visibleNavItems = useMemo(
+    () => navItems.filter((item) => !item.requiresAuth || isAuthenticated),
+    [isAuthenticated, navItems],
   );
 
   return (
@@ -64,7 +82,8 @@ export const DashboardLayout: React.FC = () => {
             isCollapsed ? 'w-20' : 'w-64',
           ].join(' ')}
         >
-          <div className="flex items-center justify-end gap-3 px-4 pt-4 pb-3">
+          <div className={['flex items-center gap-3 px-4 pt-4 pb-3', isCollapsed ? 'justify-center' : 'justify-between'].join(' ')}>
+            {!isCollapsed ? <LanguageToggle /> : null}
             <button
               type="button"
               onClick={() => setIsCollapsed((value) => !value)}
@@ -85,7 +104,7 @@ export const DashboardLayout: React.FC = () => {
 
           <nav className="flex-1 px-4 py-4">
             <div className="space-y-2">
-              {navItems.map((item) => (
+              {visibleNavItems.map((item) => (
                 <NavLink
                   key={item.to}
                   to={item.to}
@@ -114,6 +133,7 @@ export const DashboardLayout: React.FC = () => {
             </div>
           </nav>
 
+          {isAuthenticated ? (
           <div className="border-t border-white/10 p-4">
             <button
               type="button"
@@ -141,6 +161,7 @@ export const DashboardLayout: React.FC = () => {
               ) : null}
             </button>
           </div>
+          ) : null}
         </aside>
 
         <main className="min-w-0 flex-1 overflow-hidden transition-all duration-300 ease-in-out">

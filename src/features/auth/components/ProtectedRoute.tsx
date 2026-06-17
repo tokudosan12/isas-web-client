@@ -1,12 +1,11 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-
-import { UserRole } from '../types/auth.types';
+import type { UserRoleType } from '../types/auth.types';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRoles?: UserRole[];
+  requiredRoles?: UserRoleType[];
   requireAuth?: boolean;
   fallbackPath?: string;
 }
@@ -17,7 +16,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requireAuth = true,
   fallbackPath = '/',
 }) => {
-
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   // Show loading while checking auth
   if (isLoading) {
